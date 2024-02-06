@@ -63,7 +63,7 @@ public class DefaultController implements Serializable{
 		GlobalResponse res = new GlobalResponse();
 		try {
 			res.setCodigoOperacion(cuo.substring(1, cuo.length()-1));
-			res.setCodigo(ProjectConstants.C_200);
+			res.setCodigo(ProjectConstants.C_EXITO);
 			res.setDescripcion("Versión actual de aplicativo");
 			Map<String, String> healthcheck = new HashMap<String, String>();
 			healthcheck.put("Aplicativo", ProjectConstants.APLICATIVO_NOMBRE);
@@ -73,7 +73,7 @@ public class DefaultController implements Serializable{
 		} catch (Exception e) {
 			res.setCodigo(ProjectConstants.C_500);
 			res.setDescripcion(ProjectUtils.isNull(e.getCause()).concat(e.getMessage()));
-			log.error("Error al consultar versión de aplicativo marcacionPersonal-api: {}", res.getDescripcion());
+			log.error("Error al consultar versión de aplicativo Seguimiento de Depositos Judiciales-api: {}", res.getDescripcion());
 		}
 		return new ResponseEntity<GlobalResponse>(res, HttpStatus.OK);
 	}

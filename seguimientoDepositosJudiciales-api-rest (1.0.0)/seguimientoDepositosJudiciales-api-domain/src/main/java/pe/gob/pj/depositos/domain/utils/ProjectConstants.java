@@ -100,7 +100,9 @@ public class ProjectConstants {
 	public static final String C_E013 = "E013";
 	public static final String C_E014 = "E014";
 	public static final String C_E015 = "E015";
-
+	public static final String C_N001= "N001";
+	
+	
 	public static final String X_TRAZA_LOG ="TRAZA-LOG";	
 	public static final String X_CML_NOT_FOUND = "ERROR: No se puede identificar las CLASE-METODO-LINEA.";
 	
@@ -116,11 +118,14 @@ public class ProjectConstants {
 	public static final String X_E013 = " - Problemas con el consumo del endpoint: ";
 	public static final String X_E014 = " - El token captcha es nulo o no es válido. ";
 	public static final String X_E015 = " - problemas en la ejecución de la sentencia JPA. ";
+	public static final String X_N001  = " - Los datos ingresados de la persona no se pudieron contrastar con RENIEC. ";
 	
-
+	
+	public static final String STRING_DOS= "2";
 	
 	public class Proceso {
 		public static final String CONSULTA_CEJ_UNICO= "Consultar al servicio CEJ";
+		public static final String CONSULTA_RENIEC= "Consultar al servicio de Reniec";
 		public static final String CONSULTA_DEPOSITO_JUDICIAL = "Consultar Deposito Judicial";
 		public static final String CONSULTA_ORDEN_PAGO = "Consultar Orden de pago";
 	}

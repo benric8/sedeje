@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +29,8 @@ import pe.gob.pj.depositos.domain.port.usecase.ConsultaUseCasePort;
 import pe.gob.pj.depositos.domain.utils.CaptchaUtils;
 import pe.gob.pj.depositos.domain.utils.ProjectConstants;
 import pe.gob.pj.depositos.domain.utils.ProjectUtils;
+import pe.gob.pj.depositos.infraestructure.client.dtos.PersonaReniecDTO;
+import pe.gob.pj.depositos.infraestructure.client.services.ConsultaReniecWsService;
 import pe.gob.pj.depositos.infraestructure.rest.request.ConsultaDepositoJudicialRequest;
 import pe.gob.pj.depositos.infraestructure.rest.response.GlobalResponse;
 
@@ -46,6 +47,10 @@ public class ConsultaDepositosJudicialesController implements Serializable {
 	@Autowired
 	@Qualifier("consultaUseCasePort")
 	private ConsultaUseCasePort consultaUC;
+	
+	@Autowired
+	@Qualifier("consultaReniecWsService")
+	private ConsultaReniecWsService consultaReniec;
 
 	@PostMapping(value = "depositosJudiciales", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GlobalResponse> consultarDepositos(
@@ -54,14 +59,21 @@ public class ConsultaDepositosJudicialesController implements Serializable {
 			@Validated @RequestBody ConsultaDepositoJudicialRequest captcha) {
 
 		log.info("{} INICIAMOS LA CONSULTA DEPOSITOS");
-		
+	
 		GlobalResponse res = new GlobalResponse();
 		res.setCodigoOperacion(cuo.substring(1, cuo.length() - 1));
 		try {
+			PersonaReniecDTO personaReniec = consultaReniec.consultaReniecPorDni(cuo, captcha.getDocumentoIdentidad());
+			if(personaReniec==null || ProjectUtils.isNullOrEmpty(personaReniec.getNumeroDocumenoIdentidad()) || 
+					(!ProjectUtils.isNullOrEmpty(personaReniec.getNumeroDocumenoIdentidad()) && (!personaReniec.getFechaExpedicion().equalsIgnoreCase(captcha.getFechaEmision()) ))) {
+				log.error("{} La persona con datos dni:{} y fecha emisión:{} no se encontro en RENIEC {}",cuo,captcha.getDocumentoIdentidad(), captcha.getFechaEmision());
+				throw new ErrorException(ProjectConstants.C_N001, 
+						ProjectConstants.X_ERROR+ProjectConstants.Proceso.CONSULTA_RENIEC+ProjectConstants.X_N001);
+			}
+			
 			try {
 
-				if (!captcha.getAplicaCaptcha().equalsIgnoreCase(ProjectConstants.ESTADO_ACTIVO_S)
-						|| (captcha.getAplicaCaptcha().equalsIgnoreCase(ProjectConstants.ESTADO_ACTIVO_S)
+				if (!captcha.getAplicaCaptcha().equalsIgnoreCase(ProjectConstants.ESTADO_ACTIVO_S) || (captcha.getAplicaCaptcha().equalsIgnoreCase(ProjectConstants.ESTADO_ACTIVO_S)
 								&& !ProjectUtils.isNullOrEmpty(captcha.getTokenCaptcha()))) {
 					if (!captcha.getAplicaCaptcha().equalsIgnoreCase(ProjectConstants.ESTADO_ACTIVO_S) || CaptchaUtils.validCaptcha(captcha.getTokenCaptcha(), ipRemota, cuo)) {
 
@@ -70,6 +82,7 @@ public class ConsultaDepositosJudicialesController implements Serializable {
 						res.setCodigo(ProjectConstants.C_EXITO);
 						res.setDescripcion(ProjectConstants.X_EXITO);
 						res.setData(lista);
+						log.info("{} El número del DNI: {} realizó la consulta sobre el expediente {}",cuo,captcha.getDocumentoIdentidad(),captcha.getFormatoExpediente());
 					} else {
 						log.error(
 								"{} Dstos de validación captcha -> indicador de validación: {}, token captcha: {} y la ip de la petición",

@@ -76,11 +76,20 @@
 			<optional>true</optional>
 		</dependency>
 		
+		<!-- Inicio cliente EXPEDIENTES -->
 		<dependency>
 			<groupId>pe.gob.pj.ws.cliente</groupId>
 			<artifactId>client-consulta-expediente-ws</artifactId>
 			<version>1.0.6</version>
 		</dependency>
+		<!-- Fin cliente EXPEDIENTES -->
+		<!-- Inicio cliente RENIEC -->
+		<dependency>
+			<groupId>pe.gob.pj.ws.cliente</groupId>
+			<artifactId>client-reniec-ws</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<!-- fin cliente RENIEC -->
 	</dependencies>
 	
 	<dependencyManagement>
